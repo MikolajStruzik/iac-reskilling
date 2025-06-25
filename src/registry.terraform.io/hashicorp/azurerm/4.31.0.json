@@ -1,0 +1,10 @@
+{
+  "archives": {
+    "windows_386": {
+      "hashes": [
+        "h1:RqdLXhIjmbRFuzcDtSrU6R1B7vU1xBl0Q8eGQe2pgpo="
+      ],
+      "url": "terraform-provider-azurerm_4.31.0_windows_386.zip"
+    }
+  }
+}

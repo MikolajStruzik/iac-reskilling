@@ -1,0 +1,10 @@
+{
+  "archives": {
+    "windows_386": {
+      "hashes": [
+        "h1:ReNkTkCM64bktu54eGwQc29rhIejMLQsYA6kYNyBWno="
+      ],
+      "url": "terraform-provider-tls_4.1.0_windows_386.zip"
+    }
+  }
+}
