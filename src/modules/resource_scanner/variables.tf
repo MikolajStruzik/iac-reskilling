@@ -1,6 +1,6 @@
 variable "name_prefix" {
-  type = string
-  description = "Prefix of resource names"
+  type        = string
+  description = "Prefix for all names"
 }
 
 variable "resource_group_name" {
@@ -8,18 +8,21 @@ variable "resource_group_name" {
 }
 
 variable "location" {
-  type = string
+  type    = string
   default = "westeurope"
 }
 
+variable "storage_account_connection_string" {
+  type        = string
+  description = "Connection string to Storage Account"
+}
+
 variable "storage_account_name" {
-  description = "Storage Account with table and blob"
   type = string
 }
 
 variable "storage_account_key" {
-  description = "Access key to Storage Account"
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -28,17 +31,16 @@ variable "table_name" {
 }
 
 variable "blob_container" {
-  description = "Blob container for generating index.html"
   type = string
 }
 
 variable "tag_owner" {
-  type = string
+  type    = string
   default = "mikolaj.struzik@atos.net"
 }
 
 variable "tag_project" {
-  type = string
+  type    = string
   default = "IaC Reskilling"
 }
 
@@ -46,9 +48,3 @@ variable "subscription_id" {
   type        = string
   description = "Azure Subscription ID"
 }
-
-variable "storage_account_connection_string" {
-  description = "Primary connection string do Storage Account"
-  type        = string
-}
-

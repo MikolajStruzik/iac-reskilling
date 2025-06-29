@@ -7,6 +7,8 @@ terraform {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 provider "azurerm" {
   features {}
   subscription_id = "5b1f44b3-6eaf-4447-b261-d08a610a5eaa"
@@ -92,22 +94,28 @@ module "load_balancer" {
 
 # Database module: only creates table and storage
 module "database" {
-  source                = "./modules/database"
+  source               = "./modules/database"
   storage_account_name = azurerm_storage_account.web.name
-  table_name            = "iacresources"
-  resource_group_name   = "iac-reskilling-rg"
+  table_name           = "iacresources"
 }
 
-# resource_scanner
+# Resource scanner
 module "resource_scanner" {
-  source = "./modules/resource_scanner"
+   source      = "./modules/resource_scanner"
 
-  name_prefix           = "iac"
-  resource_group_name   = "iac-reskilling-rg"
-  storage_account_connection_string = azurerm_storage_account.web.primary_connection_string
-  storage_account_name  = azurerm_storage_account.web.name
-  storage_account_key   = azurerm_storage_account.web.primary_access_key
-  table_name            = module.database.table_name
-  blob_container        = azurerm_storage_container.web.name
-  subscription_id       = "5b1f44b3-6eaf-4447-b261-d08a610a5eaa"
-}
+   name_prefix = "iac"
+   resource_group_name                = azurerm_resource_group.main.name
+   location                           = azurerm_resource_group.main.location
+
+  # brakująca zmienna — connection string do tego samego Storage Account
+   storage_account_connection_string  = azurerm_storage_account.web.primary_connection_string
+   storage_account_name               = azurerm_storage_account.web.name
+   storage_account_key                = azurerm_storage_account.web.primary_access_key
+   
+   table_name                         = module.database.table_name
+   blob_container                     = azurerm_storage_container.web.name
+
+   tag_owner       = "mikolaj.struzik@atos.net"
+   tag_project     = "IaC Reskilling"
+   subscription_id = data.azurerm_client_config.current.subscription_id
+ }
