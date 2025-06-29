@@ -1,47 +1,50 @@
-resource "azurerm_function_app" "scanner" {
-  name                       = "${var.name_prefix}-scanner-func"
-  location                   = var.location
-  resource_group_name        = var.resource_group_name
-  storage_account_name       = var.storage_account_name
-  storage_account_access_key = var.storage_account_key
-  app_service_plan_id        = azurerm_app_service_plan.plan.id
-  version                    = "~4"  # wersja Functions v4
-
-      app_settings = {
-          FUNCTIONS_WORKER_RUNTIME    = "python"
-          AzureWebJobsStorage         = azurerm_storage_account.sa.primary_connection_string
-          TAG_OWNER                   = var.tag_owner
-          TAG_PROJECT                 = var.tag_project
-          TABLE_NAME                  = var.table_name
-          BLOB_CONTAINER              = var.blob_container
-          SUBSCRIPTION_ID             = var.subscription_id
-      }
-}
-
-resource "azurerm_app_service_plan" "plan" {
+// 1️⃣ Service Plan (Linux, funkcje Consumption)
+resource "azurerm_service_plan" "plan" {
   name                = "${var.name_prefix}-asp"
   location            = var.location
   resource_group_name = var.resource_group_name
-  kind                = "FunctionApp"
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
+  os_type             = "Linux"
+  sku_name            = "Y1"
+}
+
+// 2️⃣ Linux Function App
+resource "azurerm_linux_function_app" "scanner" {
+  name                       = "${var.name_prefix}-scanner-func"
+  location                   = var.location
+  resource_group_name        = var.resource_group_name
+  service_plan_id            = azurerm_service_plan.plan.id
+
+  storage_account_name       = var.storage_account_name
+  storage_account_access_key = var.storage_account_key
+
+  # Jeśli potrzebujesz Managed Identity:
+  identity {
+    type = "SystemAssigned"
+  }
+
+  site_config {
+    # określamy jedynie wersję Pythona
+    application_stack {
+      python_version = "3.9"
+    }
+    # opcjonalnie, można dodać linux_fx_version,
+    # ale przy application_stack nie jest konieczne
+    linux_fx_version = "PYTHON|3.9"
+  }
+
+  app_settings = {
+    FUNCTIONS_WORKER_RUNTIME          = "python"
+    AzureWebJobsStorage               = var.storage_account_connection_string
+    STORAGE_ACCOUNT_NAME              = var.storage_account_name
+    STORAGE_ACCOUNT_KEY               = var.storage_account_key
+    TABLE_NAME                        = var.table_name
+    BLOB_CONTAINER                    = var.blob_container
+    SUBSCRIPTION_ID                   = var.subscription_id
+    # ... inne zmienne środowiskowe
+  }
+
+  tags = {
+    Owner   = var.tag_owner
+    Project = var.tag_project
   }
 }
-
-resource "azurerm_storage_account" "sa" {
-  name                     = "${var.name_prefix}scanner00"
-  resource_group_name      = var.resource_group_name
-  location                 = var.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_storage_container" "code" {
-  name                  = "function-code"
-  storage_account_name  = azurerm_storage_account.sa.name
-  container_access_type = "private"
-}
-
-# Wyślij kod funkcji do Azure, np. z Azure CLI:
-# az storage blob upload-batch --account-name ... --destination function-code --source modules/resource_scanner/function_app

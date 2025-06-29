@@ -21,6 +21,17 @@ def main(mytime: func.TimerRequest):
     service = TableServiceClient.from_connection_string(storage_conn)
     tbl = service.get_table_client(table_name)
 
+    # 🆕 Insert example entity to meet "database module" requirement
+    try:
+        existing = tbl.get_entity(partition_key="sample", row_key="1")
+    except:
+        example = {
+            'PartitionKey': 'sample',
+            'RowKey': '1',
+            'resource_id': 'example-resource-id'
+    }
+    tbl.create_entity(example)
+
     # scan
     rows = []
     for rg in resource_client.resource_groups.list():

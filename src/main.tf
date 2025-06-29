@@ -90,11 +90,12 @@ module "load_balancer" {
   nic_ids = module.web_server.nic_ids
 }
 
-# Database
+# Database module: only creates table and storage
 module "database" {
-  source = "./modules/database"
-  table_name = "iacresources"
+  source                = "./modules/database"
   storage_account_name = azurerm_storage_account.web.name
+  table_name            = "iacresources"
+  resource_group_name   = "iac-reskilling-rg"
 }
 
 # resource_scanner
@@ -103,6 +104,7 @@ module "resource_scanner" {
 
   name_prefix           = "iac"
   resource_group_name   = "iac-reskilling-rg"
+  storage_account_connection_string = azurerm_storage_account.web.primary_connection_string
   storage_account_name  = azurerm_storage_account.web.name
   storage_account_key   = azurerm_storage_account.web.primary_access_key
   table_name            = module.database.table_name

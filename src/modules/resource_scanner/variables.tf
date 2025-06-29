@@ -46,3 +46,9 @@ variable "subscription_id" {
   type        = string
   description = "Azure Subscription ID"
 }
+
+variable "storage_account_connection_string" {
+  description = "Primary connection string do Storage Account"
+  type        = string
+}
+

@@ -1,9 +1,9 @@
 output "table_name" {
-  description = "Name of the Azure Table Storage"
-  value = azurerm_storage_table.resource_table.name
+  description = "Nazwa utworzonej tabeli w Storage Account"
+  value       = azurerm_storage_table.db_table.name
 }
 
-output "inserted_entity_id" {
-  description = "ID of the inserted table entity"
-  value       = azurerm_storage_table_entity.resource.id
+output "storage_account_name" {
+  description = "Storage Account użyty do przechowywania tabeli"
+  value       = data.azurerm_storage_account.db_sa.name
 }
